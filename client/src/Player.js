@@ -37,17 +37,20 @@ export default class Player extends Phaser.GameObjects.Sprite {
         this.canChangeMap = true;
 
         // Player nickname text
-        this.playerNickname = this.scene.add.text((this.x - this.width * 1.4), (this.y - (this.height / 2)), 'Player');
+        this.playerNickname = this.scene.add.text(this.x, (this.y - (this.height / 2)), 'Player').setOrigin(0.5, 0.5);
 
         // Add spacebar input
         this.spacebar = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    }
+
+        this.scene.events.on('postupdate', () => {
+            this.playerNickname.x = Math.round(this.x);
+            this.playerNickname.y = Math.round(this.y - (this.height / 2));
+        });
+    } 
+
 
     update(time, delta) {
         const prevVelocity = this.body.velocity.clone();
-
-        // Show player nickname above player
-        this.showPlayerNickname();
 
         if (this.scene.isInterfaceOpen()) {
             this.body.setVelocity(0);
@@ -117,11 +120,6 @@ export default class Player extends Phaser.GameObjects.Sprite {
         if (updateTexture) {
             this.setTexture("currentPlayer", `misa-${direction}`);
         }
-    }
-
-    showPlayerNickname() {
-        this.playerNickname.x = this.x - (this.playerNickname.width / 2);
-        this.playerNickname.y = this.y - (this.height / 2);
     }
 
     isMoved() {
