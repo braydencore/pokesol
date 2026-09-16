@@ -9,6 +9,7 @@ import NpcManager from "./NpcManager";
 import FireRedBattleUI from "./ui/FireRedBattleUI";
 import PokemonCenterManager from "./PokemonCenterManager";
 import WildEncounterManager from "./WildEncounterManager";
+import MobileControls from "./MobileControls";
 import { tickPlaySession } from "./state/gameState";
 
 let cursors, socketKey;
@@ -103,6 +104,7 @@ export class Scene2 extends Phaser.Scene {
         this.npcManager = new NpcManager(this, this.dialogueUi);
         this.wildEncounterManager = new WildEncounterManager(this, this.battleUi);
         this.pokemonCenterManager = new PokemonCenterManager(this);
+        this.mobileControls = new MobileControls(this);
         room.then((currentRoom) => {
             if (this.isSceneShuttingDown) {
                 return;
@@ -153,6 +155,11 @@ export class Scene2 extends Phaser.Scene {
             if (this.pokemonCenterManager) {
                 this.pokemonCenterManager.destroy();
                 this.pokemonCenterManager = null;
+            }
+
+            if (this.mobileControls) {
+                this.mobileControls.destroy();
+                this.mobileControls = null;
             }
 
             if (this.socketTimerEvent) {

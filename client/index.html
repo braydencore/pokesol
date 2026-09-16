@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -13,6 +13,8 @@
         width: 100%;
         height: 100%;
         background: #0f1020;
+        overflow: hidden;
+        overscroll-behavior: none;
       }
 
       body {
@@ -22,16 +24,89 @@
       }
 
       #game-container {
-        width: 800px;
-        height: 450px;
+        width: 100%;
+        height: 100%;
       }
 
       canvas {
         display: block;
       }
+
+      /* Touch controls are only shown on touch-primary devices (phones/tablets) -
+         a mouse+keyboard device never sees them. */
+      .touch-controls {
+        display: none;
+      }
+
+      @media (pointer: coarse) {
+        .touch-controls {
+          display: block;
+        }
+      }
+
+      .touch-controls {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 10;
+        font-family: "Press Start 2P", monospace;
+      }
+
+      .touch-btn {
+        position: absolute;
+        pointer-events: auto;
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.18);
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        color: #ffffff;
+        border-radius: 12px;
+      }
+
+      .touch-btn:active {
+        background: rgba(255, 255, 255, 0.35);
+      }
+
+      /* D-pad, bottom-left */
+      #touch-up    { left: 76px;  bottom: 148px; width: 56px; height: 56px; }
+      #touch-down  { left: 76px;  bottom: 20px;  width: 56px; height: 56px; }
+      #touch-left  { left: 12px;  bottom: 84px;  width: 56px; height: 56px; }
+      #touch-right { left: 140px; bottom: 84px;  width: 56px; height: 56px; }
+
+      /* Confirm/cancel buttons, bottom-right */
+      #touch-confirm {
+        right: 24px;
+        bottom: 96px;
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        font-size: 14px;
+      }
+
+      #touch-cancel {
+        right: 104px;
+        bottom: 32px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        font-size: 12px;
+      }
     </style>
   </head>
   <body>
     <div id="game-container"></div>
+
+    <div class="touch-controls">
+      <div id="touch-up" class="touch-btn">▲</div>
+      <div id="touch-down" class="touch-btn">▼</div>
+      <div id="touch-left" class="touch-btn">◀</div>
+      <div id="touch-right" class="touch-btn">▶</div>
+      <div id="touch-confirm" class="touch-btn">Z</div>
+      <div id="touch-cancel" class="touch-btn">X</div>
+    </div>
   </body>
 </html>
