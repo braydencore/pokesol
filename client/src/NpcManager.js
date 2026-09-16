@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { fetchNpcs, interactWithNpc } from "./api/npcs";
-import { room } from "./SocketServer";
+import { getPersistentPlayerId } from "./state/playerIdentity";
 import { ENTITY_SIZE } from "./constants/entity";
 
 const FONT_FAMILY = "\"Press Start 2P\"";
@@ -9,7 +9,7 @@ export default class NpcManager {
     constructor(scene, dialogueUi) {
         this.scene = scene;
         this.dialogueUi = dialogueUi;
-        this.playerId = null;
+        this.playerId = getPersistentPlayerId();
         this.npcs = [];
         this.activeNpc = null;
         this.destroyed = false;
@@ -24,10 +24,7 @@ export default class NpcManager {
             padding: { x: 6, y: 4 }
         }).setScrollFactor(1).setDepth(40).setVisible(false);
 
-        this.readyPromise = room.then(async (currentRoom) => {
-            this.playerId = currentRoom.sessionId;
-            await this.loadForMap(this.scene.mapName);
-        });
+        this.readyPromise = this.loadForMap(this.scene.mapName);
     }
 
     async loadForMap(mapName) {

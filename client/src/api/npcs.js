@@ -1,4 +1,4 @@
-const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:3000/api`;
+const API_BASE_URL = `${WORKER_URL}/api`;
 
 async function readJson(response) {
     const payload = await response.json();

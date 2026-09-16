@@ -1,24 +1,88 @@
-import * as Colyseus from "colyseus.js";
-
 /*================================================
 | Array with current online players
 */
-let onlinePlayers = {};
+export const onlinePlayers = {};
 
-const SOCKET_PROTOCOL = window.location.protocol === "https:" ? "wss" : "ws";
-const SOCKET_HOST = window.location.hostname;
-const SOCKET_PORT = 3000;
-const SOCKET_URL = `${SOCKET_PROTOCOL}://${SOCKET_HOST}:${SOCKET_PORT}`;
+const WS_BASE_URL = WORKER_URL.replace(/^http/, "ws");
+
+let activeSocket = null;
 
 /*================================================
-| Colyseus connection with server
+| Opens a WebSocket to the Durable Object for `mapName`, closing any
+| previous connection first (map changes mean a new DO, not a message on
+| the old one). `room` is a live-bound export: importers read whatever
+| the most recent connectToMap() call resolved.
 */
-var client = new Colyseus.Client(SOCKET_URL);
-let room = client.joinOrCreate("poke_world").then(room => {
-    console.log(room.sessionId, "joined", room.name);
-    return room
-}).catch(e => {
-    console.log("JOIN ERROR", e);
-});
+export let room = null;
 
-export {onlinePlayers, room};
+export function connectToMap(mapName, position = {}) {
+    if (activeSocket) {
+        activeSocket.close();
+        activeSocket = null;
+    }
+
+    const params = new URLSearchParams({
+        map: mapName,
+        x: String(Math.round(position.x ?? 0)),
+        y: String(Math.round(position.y ?? 0))
+    });
+
+    room = new Promise((resolve, reject) => {
+        const ws = new WebSocket(`${WS_BASE_URL}/ws?${params.toString()}`);
+        const listeners = new Map();
+
+        const currentRoom = {
+            sessionId: null,
+            send(type, data) {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type, data }));
+                }
+            },
+            onMessage(type, handler) {
+                if (!listeners.has(type)) {
+                    listeners.set(type, []);
+                }
+                listeners.get(type).push(handler);
+
+                return () => {
+                    const handlers = listeners.get(type) || [];
+                    const index = handlers.indexOf(handler);
+                    if (index !== -1) {
+                        handlers.splice(index, 1);
+                    }
+                };
+            },
+            close() {
+                ws.close();
+            }
+        };
+
+        ws.addEventListener("message", (event) => {
+            let message;
+            try {
+                message = JSON.parse(event.data);
+            } catch (error) {
+                return;
+            }
+
+            if (message.type === "CURRENT_PLAYERS" && message.data?.sessionId) {
+                currentRoom.sessionId = message.data.sessionId;
+            }
+
+            const specificHandlers = listeners.get(message.type) || [];
+            const wildcardHandlers = listeners.get("*") || [];
+            [...specificHandlers, ...wildcardHandlers].forEach((handler) => handler(message.type, message.data));
+        });
+
+        ws.addEventListener("open", () => {
+            activeSocket = currentRoom;
+            resolve(currentRoom);
+        });
+
+        ws.addEventListener("error", (event) => reject(event));
+    }).catch((e) => {
+        console.log("JOIN ERROR", e);
+    });
+
+    return room;
+}
