@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { onlinePlayers, room } from './SocketServer';
+import { connectToMap, onlinePlayers, room } from './SocketServer';
 
 import OnlinePlayer from "./OnlinePlayer";
 import Player from "./Player";
@@ -65,13 +65,21 @@ export class Scene2 extends Phaser.Scene {
             || this.map.findObject("SpawnPoints", obj => obj.name === "Spawn Point");
 
         // Set player
+        const startX = this.playerPosition?.x ?? spawnPoint.x;
+        const startY = this.playerPosition?.y ?? spawnPoint.y;
+
         this.player = new Player({
             scene: this,
             worldLayer: this.worldLayer,
             key: 'player',
-            x: this.playerPosition?.x ?? spawnPoint.x,
-            y: this.playerPosition?.y ?? spawnPoint.y
+            x: startX,
+            y: startY
         });
+
+        // Each map is its own Durable Object, so switching maps means
+        // connecting to a different room rather than sending a message on
+        // the old one.
+        connectToMap(this.mapName, { x: startX, y: startY });
 
         const camera = this.cameras.main;
         camera.startFollow(this.player);
@@ -374,16 +382,6 @@ export class Scene2 extends Phaser.Scene {
             }
 
             remotePlayer.stopWalking(data.position);
-            return;
-        }
-
-        if (type === "PLAYER_CHANGED_MAP") {
-            if (data.map !== this.mapName) {
-                this.destroyOnlinePlayer(data.sessionId);
-                return;
-            }
-
-            this.ensureOnlinePlayer(data);
         }
     }
 

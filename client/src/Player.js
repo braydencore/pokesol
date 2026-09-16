@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import { room } from './SocketServer';
 import { ENTITY_SIZE } from "./constants/entity";
 
 
@@ -172,11 +171,6 @@ export default class Player extends Phaser.GameObjects.Sprite {
             playerTexturePosition: nextFacing,
             spawnPointName: spawnPoint?.value || "Spawn Point"
         });
-
-        room.then((room) => room.send(
-             "PLAYER_CHANGED_MAP",{
-            map: world.name
-        }));
     }
 
     getInteractionPoint() {
