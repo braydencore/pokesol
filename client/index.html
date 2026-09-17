@@ -31,6 +31,7 @@
         flex-direction: column;
         width: 100%;
         height: 100%;
+        box-sizing: border-box;
       }
 
       .screen-bezel {
@@ -55,6 +56,10 @@
          shell with a button deck below, so the game is playable held
          upright - no rotating the phone required. */
       @media (pointer: coarse) {
+        .console-shell {
+          padding-top: max(10px, env(safe-area-inset-top));
+        }
+
         .screen-bezel {
           flex: 0 0 auto;
           aspect-ratio: 480 / 600;
@@ -62,10 +67,28 @@
           padding: 14px 14px 6px;
           box-sizing: border-box;
           background: #050505;
-          border-radius: 0 0 26px 26px;
+          border-radius: 16px 16px 26px 26px;
           box-shadow:
             inset 0 0 0 3px #000,
             inset 0 6px 14px rgba(0, 0, 0, 0.85);
+          position: relative;
+        }
+
+        /* A soft diagonal streak across the "glass", like light catching
+           an actual LCD cover instead of a flat matte fill. */
+        .screen-bezel::before {
+          content: "";
+          position: absolute;
+          inset: 14px 14px 6px;
+          border-radius: 4px;
+          background: linear-gradient(
+            115deg,
+            rgba(255, 255, 255, 0.10) 0%,
+            rgba(255, 255, 255, 0.03) 18%,
+            rgba(255, 255, 255, 0) 32%
+          );
+          pointer-events: none;
+          z-index: 5;
         }
 
         .control-deck {
@@ -75,7 +98,9 @@
           flex-direction: column;
           justify-content: center;
           gap: 34px;
-          background: linear-gradient(160deg, #7c6fae 0%, #5b4f8a 55%, #473c6e 100%);
+          background:
+            radial-gradient(140% 90% at 30% -10%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 55%),
+            linear-gradient(160deg, #7c6fae 0%, #5b4f8a 55%, #473c6e 100%);
           padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
           box-sizing: border-box;
         }
