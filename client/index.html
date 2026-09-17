@@ -12,7 +12,7 @@
         padding: 0;
         width: 100%;
         height: 100%;
-        background: #0f1020;
+        background: #2c2c2c;
         overflow: hidden;
         overscroll-behavior: none;
       }
@@ -32,13 +32,62 @@
         display: block;
       }
 
+      /* This game's screen is a landscape rectangle (800x450). On a phone
+         held in portrait it would only fill a thin strip with huge black
+         bars, so on touch devices we ask for landscape instead - the game
+         and controls stay hidden until the phone is turned. */
+      .rotate-prompt {
+        display: none;
+      }
+
+      @media (pointer: coarse) and (orientation: portrait) {
+        #game-container,
+        .touch-controls {
+          display: none;
+        }
+
+        .rotate-prompt {
+          display: flex;
+        }
+      }
+
+      .rotate-prompt {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        background: #2c2c2c;
+        color: #fff4a3;
+        font-family: "Press Start 2P", monospace;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0 32px;
+        gap: 18px;
+      }
+
+      .rotate-prompt-icon {
+        font-size: 40px;
+        animation: rotate-hint 1.6s ease-in-out infinite;
+      }
+
+      .rotate-prompt-text {
+        font-size: 12px;
+        line-height: 1.8;
+      }
+
+      @keyframes rotate-hint {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(-90deg); }
+      }
+
       /* Touch controls are only shown on touch-primary devices (phones/tablets) -
          a mouse+keyboard device never sees them. */
       .touch-controls {
         display: none;
       }
 
-      @media (pointer: coarse) {
+      @media (pointer: coarse) and (orientation: landscape) {
         .touch-controls {
           display: block;
         }
@@ -61,39 +110,42 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.18);
-        border: 2px solid rgba(255, 255, 255, 0.35);
-        color: #ffffff;
-        border-radius: 12px;
+        background: rgba(44, 44, 44, 0.72);
+        border: 2px solid #fff4a3;
+        color: #fff4a3;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
       }
 
       .touch-btn:active {
-        background: rgba(255, 255, 255, 0.35);
+        background: rgba(255, 244, 163, 0.35);
+        color: #2c2c2c;
       }
 
-      /* D-pad, bottom-left */
-      #touch-up    { left: 76px;  bottom: 148px; width: 56px; height: 56px; }
-      #touch-down  { left: 76px;  bottom: 20px;  width: 56px; height: 56px; }
-      #touch-left  { left: 12px;  bottom: 84px;  width: 56px; height: 56px; }
-      #touch-right { left: 140px; bottom: 84px;  width: 56px; height: 56px; }
+      /* D-pad, bottom-left. env(safe-area-inset-*) keeps it clear of the
+         iPhone home-indicator / notch area in landscape. */
+      #touch-up    { left: calc(70px + env(safe-area-inset-left));  bottom: calc(96px + env(safe-area-inset-bottom));  width: 48px; height: 48px; }
+      #touch-down  { left: calc(70px + env(safe-area-inset-left));  bottom: calc(12px + env(safe-area-inset-bottom));  width: 48px; height: 48px; }
+      #touch-left  { left: calc(12px + env(safe-area-inset-left));  bottom: calc(54px + env(safe-area-inset-bottom));  width: 48px; height: 48px; }
+      #touch-right { left: calc(128px + env(safe-area-inset-left)); bottom: calc(54px + env(safe-area-inset-bottom));  width: 48px; height: 48px; }
 
       /* Confirm/cancel buttons, bottom-right */
       #touch-confirm {
-        right: 24px;
-        bottom: 96px;
-        width: 68px;
-        height: 68px;
+        right: calc(20px + env(safe-area-inset-right));
+        bottom: calc(66px + env(safe-area-inset-bottom));
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
-        font-size: 14px;
+        font-size: 13px;
       }
 
       #touch-cancel {
-        right: 104px;
-        bottom: 32px;
-        width: 56px;
-        height: 56px;
+        right: calc(92px + env(safe-area-inset-right));
+        bottom: calc(14px + env(safe-area-inset-bottom));
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
-        font-size: 12px;
+        font-size: 11px;
       }
     </style>
   </head>
@@ -107,6 +159,11 @@
       <div id="touch-right" class="touch-btn">▶</div>
       <div id="touch-confirm" class="touch-btn">Z</div>
       <div id="touch-cancel" class="touch-btn">X</div>
+    </div>
+
+    <div class="rotate-prompt">
+      <div class="rotate-prompt-icon">📱</div>
+      <div class="rotate-prompt-text">Turn your phone<br>sideways to play</div>
     </div>
   </body>
 </html>
