@@ -61,7 +61,11 @@
           width: 100%;
           padding: 14px 14px 6px;
           box-sizing: border-box;
-          border-radius: 0 0 22px 22px;
+          background: #050505;
+          border-radius: 0 0 26px 26px;
+          box-shadow:
+            inset 0 0 0 3px #000,
+            inset 0 6px 14px rgba(0, 0, 0, 0.85);
         }
 
         .control-deck {
@@ -70,11 +74,29 @@
           min-height: 0;
           flex-direction: column;
           justify-content: center;
-          gap: 28px;
-          background: linear-gradient(#6f6396, #564a80);
-          padding: 18px 20px calc(18px + env(safe-area-inset-bottom));
+          gap: 34px;
+          background: linear-gradient(160deg, #7c6fae 0%, #5b4f8a 55%, #473c6e 100%);
+          padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
           box-sizing: border-box;
         }
+      }
+
+      .deck-brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 9px;
+        letter-spacing: 1px;
+      }
+
+      .power-led {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #ff9a9a, #d81f1f 70%);
+        box-shadow: 0 0 4px 1px rgba(255, 40, 40, 0.7);
       }
 
       .control-row {
@@ -83,18 +105,48 @@
         justify-content: space-between;
       }
 
+      .speaker-grille {
+        display: flex;
+        justify-content: center;
+        gap: 7px;
+      }
+
+      .speaker-grille span {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.4);
+      }
+
+      /* D-pad: one continuous cross-shaped surface (clip-path), not four
+         separate boxes with visible seams - the four buttons underneath
+         are still separate touch targets, just visually merged. */
       .dpad {
         position: relative;
         width: 132px;
         height: 132px;
         flex: 0 0 auto;
+        background: linear-gradient(145deg, #3c3c3c, #181818);
+        clip-path: polygon(
+          44px 0, 88px 0, 88px 44px, 132px 44px, 132px 88px, 88px 88px,
+          88px 132px, 44px 132px, 44px 88px, 0 88px, 0 44px, 44px 44px
+        );
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.08);
       }
 
-      .action-buttons {
-        display: flex;
-        align-items: flex-end;
-        gap: 18px;
-        flex: 0 0 auto;
+      .dpad::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 16px;
+        height: 16px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #4a4a4a, #141414);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+        pointer-events: none;
       }
 
       .touch-btn {
@@ -104,45 +156,61 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #2c2c2c;
-        border: 2px solid #fff4a3;
-        color: #fff4a3;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-      }
-
-      .touch-btn:active {
-        background: #fff4a3;
-        color: #2c2c2c;
       }
 
       .dpad .touch-btn {
         position: absolute;
         width: 44px;
         height: 44px;
+        color: #cfcfcf;
+        font-size: 16px;
+        transition: color 0.05s;
       }
 
-      #touch-up    { top: 0;    left: 44px; border-radius: 8px 8px 0 0; }
-      #touch-down  { bottom: 0; left: 44px; border-radius: 0 0 8px 8px; }
-      #touch-left  { left: 0;   top: 44px;  border-radius: 8px 0 0 8px; }
-      #touch-right { right: 0;  top: 44px;  border-radius: 0 8px 8px 0; }
+      .dpad .touch-btn:active {
+        background: rgba(255, 244, 163, 0.22);
+        color: #fff4a3;
+      }
 
+      #touch-up    { top: 0;    left: 44px; }
+      #touch-down  { bottom: 0; left: 44px; }
+      #touch-left  { left: 0;   top: 44px; }
+      #touch-right { right: 0;  top: 44px; }
+
+      .action-buttons {
+        display: flex;
+        align-items: flex-end;
+        gap: 18px;
+        flex: 0 0 auto;
+      }
+
+      /* Convex, pressable-looking buttons: a "ledge" shadow beneath gives
+         them height at rest, which flattens on press for real tactile
+         feedback instead of a flat color swap. */
       .action-buttons .touch-btn {
-        width: 56px;
-        height: 56px;
+        width: 58px;
+        height: 58px;
         border-radius: 50%;
-        font-size: 13px;
+        font-size: 14px;
+        color: #4a3c00;
+        background: radial-gradient(circle at 32% 28%, #fffbe6, #fff4a3 45%, #dcb94e 100%);
+        box-shadow:
+          0 4px 0 #93791f,
+          0 7px 9px rgba(0, 0, 0, 0.45),
+          inset 0 1px 1px rgba(255, 255, 255, 0.7);
+        transition: transform 0.05s, box-shadow 0.05s;
+      }
+
+      .action-buttons .touch-btn:active {
+        background: radial-gradient(circle at 32% 28%, #e0c15c, #c7a83f 65%);
+        box-shadow:
+          0 1px 0 #93791f,
+          inset 0 3px 5px rgba(0, 0, 0, 0.35);
+        transform: translateY(3px);
       }
 
       #touch-cancel {
         margin-bottom: 22px;
-      }
-
-      .brand-row {
-        text-align: center;
-        color: rgba(255, 255, 255, 0.55);
-        font-size: 9px;
-        letter-spacing: 1px;
       }
     </style>
   </head>
@@ -153,6 +221,11 @@
       </div>
 
       <div class="control-deck">
+        <div class="deck-brand">
+          <span class="power-led"></span>
+          <span>POKESOL</span>
+        </div>
+
         <div class="control-row">
           <div class="dpad">
             <div id="touch-up" class="touch-btn">▲</div>
@@ -165,7 +238,10 @@
             <div id="touch-confirm" class="touch-btn">Z</div>
           </div>
         </div>
-        <div class="brand-row">POKESOL</div>
+
+        <div class="speaker-grille">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
       </div>
     </div>
   </body>
