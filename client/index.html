@@ -57,7 +57,7 @@
       @media (pointer: coarse) {
         .screen-bezel {
           flex: 0 0 auto;
-          aspect-ratio: 800 / 450;
+          aspect-ratio: 480 / 600;
           width: 100%;
           padding: 14px 14px 6px;
           box-sizing: border-box;
@@ -78,6 +78,31 @@
           background: linear-gradient(160deg, #7c6fae 0%, #5b4f8a 55%, #473c6e 100%);
           padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
           box-sizing: border-box;
+        }
+      }
+
+      /* The portrait shell (screen stacked above a full-width deck) would
+         badly overflow a landscape phone, since the screen's height is
+         width-driven. Fall back to a side-by-side layout there instead of
+         stacking - a secondary case since portrait is the primary target. */
+      @media (pointer: coarse) and (orientation: landscape) {
+        .console-shell {
+          flex-direction: row;
+        }
+
+        .screen-bezel {
+          flex: 1;
+          width: auto;
+          height: 100%;
+          aspect-ratio: auto;
+          border-radius: 0 26px 26px 0;
+        }
+
+        .control-deck {
+          flex: 0 0 240px;
+          justify-content: center;
+          gap: 20px;
+          padding: 14px calc(14px + env(safe-area-inset-right)) 14px 14px;
         }
       }
 
